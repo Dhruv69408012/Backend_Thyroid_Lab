@@ -1,0 +1,7 @@
+Primary hypothyroidism is a thyroid disorder characterized by insufficient production of thyroid hormones, primarily thyroxine (T4) and triiodothyronine (T3), due to dysfunction or damage to the thyroid gland itself. This condition often results from autoimmune thyroiditis, commonly known as Hashimoto's thyroiditis, where the immune system mistakenly attacks and damages the thyroid tissue.
+
+Other causes include thyroid surgery, radiation therapy, certain medications, and iodine deficiency. In primary hypothyroidism, the thyroid gland fails to produce an adequate amount of hormones, leading to disruptions in the body's metabolic processes. Common symptoms include fatigue, weight gain, cold sensitivity, dry skin, constipation, depression, and impaired concentration.
+
+Diagnosis involves blood tests to measure thyroid hormone levels (T4, T3) and thyroid-stimulating hormone (TSH). Elevated TSH levels along with decreased T4 and T3 levels indicate primary hypothyroidism. Treatment typically involves lifelong thyroid hormone replacement therapy, often with synthetic levothyroxine, to restore hormone levels and alleviate symptoms.
+
+Regular monitoring and adjustments in medication dosage are essential to maintain optimal thyroid function. If left untreated, primary hypothyroidism can lead to complications such as cardiovascular issues, infertility, and neurological problems. It is crucial to consult with a healthcare professional for accurate diagnosis and personalized management.
