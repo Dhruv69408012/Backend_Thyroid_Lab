@@ -3,11 +3,9 @@ import json
 import joblib
 import pandas as pd
 import numpy as np
-import os
+from pathlib import Path
 input_data = json.loads(sys.argv[1])
-
-script_directory = os.path.dirname(os.path.abspath(__file__))
-path_to_model = os.path.join(script_directory, 'xgmodel.pkl')
+current_working_directory = Path.cwd()
 
 encoding = {
     0: 'PRIMARY HYPORHYROID',
@@ -30,7 +28,11 @@ def cleaning(df):
     df = df.replace(["t"], 1)
     df = df.replace(["f"], 0)
     return df
-model = joblib.load(path_to_model)
+
+try:
+    model = joblib.load("./ML-model/xgmodel.pkl")
+except FileNotFoundError:
+    received = {"condition": "UNKNOWN_ERROR"}
 
 df = pd.DataFrame([input_data])
 
@@ -42,5 +44,6 @@ try:
     received = {"condition": resulting[0]}
 except Exception as e:
     received = {"condition": "UNKNOWN_ERROR"}
+
 
 print(json.dumps(received))
