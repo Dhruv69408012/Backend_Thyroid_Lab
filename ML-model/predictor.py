@@ -41,7 +41,6 @@ try:
     resulting = [encoding[i] for i in y_pred]
     received = {"condition": resulting[0]}
 except Exception as e:
-    print(f"Error predicting condition: {e}")
     received = {"condition": "UNKNOWN_ERROR"}
 
 print(json.dumps(received))
