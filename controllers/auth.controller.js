@@ -300,7 +300,7 @@ const authController = {
           console.error(error);
           res.status(500).json({
             success: false,
-            data: { message: "Internal Server Error" },
+            data: { condition: error, message: "Internal Server Error" },
           });
         }
       });
