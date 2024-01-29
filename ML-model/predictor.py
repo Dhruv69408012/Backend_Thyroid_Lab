@@ -3,16 +3,20 @@ import json
 import joblib
 import pandas as pd
 import numpy as np
+import os
 
 input_data = json.loads(sys.argv[1])
 
-encoding={
-    0:'PRIMARY HYPORHYROID',
-    1:'SECONDARY HYPOTHYROID',
-    2:'COMPENSATED HYPOTHYROID',
-    3:'Hypothyroid',
-    4:'Hyperthyroid',
-    5:'NEGATIVE'
+script_directory = os.path.dirname(os.path.abspath(__file__))
+path_to_model = os.path.join(script_directory, 'xgmodel.pkl')
+
+encoding = {
+    0: 'PRIMARY HYPORHYROID',
+    1: 'SECONDARY HYPOTHYROID',
+    2: 'COMPENSATED HYPOTHYROID',
+    3: 'Hypothyroid',
+    4: 'Hyperthyroid',
+    5: 'NEGATIVE'
 }
 
 def cleaning(df):
@@ -27,20 +31,18 @@ def cleaning(df):
     df = df.replace(["t"], 1)
     df = df.replace(["f"], 0)
     return df
-
-
-model = joblib.load(r"D:\Thyroid-r\Backend\ML-model\xgmodel.pkl")
+model = joblib.load(path_to_model)
 
 df = pd.DataFrame([input_data])
 
 df = cleaning(df)
 
-y_pred = model.predict(df)
+try:
+    y_pred = model.predict(df)
+    resulting = [encoding[i] for i in y_pred]
+    received = {"condition": resulting[0]}
+except Exception as e:
+    print(f"Error predicting condition: {e}")
+    received = {"condition": "UNKNOWN_ERROR"}
 
-resulting=[]
-
-for i in y_pred:
-    resulting.append(encoding[i])
-
-recieved={"condition":resulting[0]}
-print(json.dumps(recieved)) 
+print(json.dumps(received))

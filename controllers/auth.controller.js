@@ -10,7 +10,6 @@ const { sendOtp } = require("../utils/sendOtp");
 const { OTP } = require("../utils/otp");
 const { sendFeedback } = require("../utils/sendFeedback");
 const { setUser, getUser } = require("../user/set");
-const { start } = require("repl");
 
 const authController = {
   register: async (req, res) => {
@@ -260,25 +259,27 @@ const authController = {
     try {
       const report_data = req.body;
       let condition = "";
-    
+
       const pythonScript = "ML-model\\predictor.py";
       const inputDataJson = JSON.stringify(report_data);
-    
+
       const pythonProcess = spawn("python", [pythonScript, inputDataJson]);
-    
+
+      let errorData = "";
+
       pythonProcess.stdout.on("data", async (data) => {
         try {
           const outputFromPython = JSON.parse(data.toString());
           condition = outputFromPython?.condition;
-    
+
           const { logged_user } = getUser();
-    
+
           const updatedUser = await User.findOneAndUpdate(
             { uname: logged_user },
             { $set: { condition: condition } },
-            { new: true } 
+            { new: true }
           );
-    
+
           if (updatedUser) {
             res.json({
               success: true,
@@ -303,6 +304,21 @@ const authController = {
           });
         }
       });
+
+      pythonProcess.stderr.on("data", (data) => {
+        errorData += data.toString();
+      });
+
+      pythonProcess.on("close", (code) => {
+        if (code !== 0) {
+          console.error(`Python process exited with code ${code}`);
+          console.error(`Error from Python script: ${errorData}`);
+          res.status(500).json({
+            success: false,
+            data: { message: "Error in Python script execution" },
+          });
+        }
+      });
     } catch (error) {
       console.error(error);
       return res.status(400).json({
@@ -310,8 +326,6 @@ const authController = {
         data: { message: "Error processing request" },
       });
     }
-    
-    
   },
 
   learn: async (req, res) => {
