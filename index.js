@@ -3,7 +3,7 @@ require("dotenv").config();
 const app = express();
 const cors = require("cors");
 
-const allowlist = ["http://localhost:3000"];
+const allowlist = ["https://thyroidlab-do1sm25az-dhruv69408012s-projects.vercel.app/"];
 
 const corsOptions = function (req, callback) {
   if (allowlist.indexOf(req.header("Origin")) !== -1) {
