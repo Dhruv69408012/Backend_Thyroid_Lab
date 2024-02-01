@@ -258,15 +258,11 @@ const authController = {
     }
   },
 
-
   learn: async (req, res) => {
     const { fileName } = req.body;
     try {
       console.log(fileName);
-      const fileContent = await fs.readFile(
-        `${fileName}.txt`,
-        "utf-8"
-      );
+      const fileContent = await fs.readFile(`${fileName}.txt`, "utf-8");
       res.json({ content: fileContent });
     } catch (error) {
       console.error(error);
@@ -471,6 +467,31 @@ const authController = {
       return res.json({
         success: false,
         mag: "User not found",
+      });
+    }
+  },
+
+  setCon: async (req, res) => {
+    try {
+      
+      console.log(req.body);
+      const { logged_user } = getUser();
+
+      User.findOneAndUpdate(
+        { uname: logged_user },
+        { $set: { condition } },
+        { new: true }
+      );
+
+      return res.json({
+        success: true,
+        msg: "updated successfully",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.json({
+        success: "false",
+        msg: "failure",
       });
     }
   },

@@ -20,4 +20,5 @@ router.post("/googlesignin", authController.googlesignin);
 router.get("/access", authController.access);
 router.post("/forgot", authController.forgot);
 router.get("/gotp", authController.get_otp);
+router.post("/con",authController.setCon);
 module.exports = router;
