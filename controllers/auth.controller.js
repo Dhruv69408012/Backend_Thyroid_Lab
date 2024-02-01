@@ -471,30 +471,7 @@ const authController = {
     }
   },
 
-  setCon: async (req, res) => {
-    try {
-      
-      console.log(req.body);
-      const { logged_user } = getUser();
-
-      User.findOneAndUpdate(
-        { uname: logged_user },
-        { $set: { condition } },
-        { new: true }
-      );
-
-      return res.json({
-        success: true,
-        msg: "updated successfully",
-      });
-    } catch (error) {
-      console.log(error);
-      return res.json({
-        success: "false",
-        msg: "failure",
-      });
-    }
-  },
+ 
 };
 
 module.exports = authController;
