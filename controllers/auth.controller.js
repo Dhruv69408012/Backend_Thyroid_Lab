@@ -264,7 +264,7 @@ const authController = {
     try {
       console.log(fileName);
       const fileContent = await fs.readFile(
-        `D:/Thyroid-r/Backend/Learn_mores/${fileName}.txt`,
+        `${fileName}.txt`,
         "utf-8"
       );
       res.json({ content: fileContent });
