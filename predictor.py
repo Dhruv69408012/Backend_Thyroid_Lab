@@ -1,8 +1,9 @@
 import sys
 import json
-import joblib
 import pandas as pd
 import numpy as np
+import joblib
+
 
 input_data = json.loads(sys.argv[1])
 
