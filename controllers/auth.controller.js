@@ -50,7 +50,10 @@ const authController = {
       if (user?.otp === "") {
         otp = OTP();
         sendOtp(user?.uname, user?.email, otp);
-        await User.updateOne({ uname: logged_user }, { $set: { otp } });
+        await User.updateOne(
+          { uname: logged_user },
+          { $set: { otp, status: statusEnum.ACTIVE } }
+        );
       }
       res.json({
         success: true,
@@ -260,7 +263,7 @@ const authController = {
       const report_data = req.body;
       let condition = "";
 
-      const pythonScript = "ML-model\\predictor.py";
+      const pythonScript = "predictor.py";
       const inputDataJson = JSON.stringify(report_data);
 
       const pythonProcess = spawn("python", [pythonScript, inputDataJson]);
@@ -375,6 +378,23 @@ const authController = {
       res.json({
         success: false,
         problem: error,
+      });
+    }
+  },
+
+  get_otp: async (req, res) => {
+    try {
+      const { logged_user } = getUser();
+      const user = await User.findOne({ uname: logged_user });
+      return res.json({
+        success: true,
+        otp: user?.otp,
+      });
+    } catch (error) {
+      console.log(error);
+      res.json({
+        success: false,
+        msg: "failure",
       });
     }
   },

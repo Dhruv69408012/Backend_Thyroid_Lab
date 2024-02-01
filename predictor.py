@@ -26,7 +26,7 @@ def cleaning(df):
     df = df.replace(["f"], 0)
     return df
 
-model = joblib.load("./ML-model/xgmodel.pkl")
+model = joblib.load("xgmodel.pkl")
 
 df = pd.DataFrame([input_data])
 
