@@ -262,9 +262,11 @@ const authController = {
     try {
       const report_data = req.body;
       let condition = "";
+      console.log(report_data);
 
       const pythonScript = "predictor.py";
       const inputDataJson = JSON.stringify(report_data);
+      console.log(inputDataJson);
 
       const pythonProcess = spawn("python", [pythonScript, inputDataJson]);
 
