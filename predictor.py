@@ -1,9 +1,6 @@
 import sys
 import json
-import pickle
-
-# Load input data from command line argument
-input_data = json.loads(sys.argv[1])
+import xgboost as xgb
 
 encoding = {
     0: 'PRIMARY HYPORHYROID',
@@ -25,6 +22,8 @@ def cleaning(input_data):
         input_data["FTI"] = 97.5
     return input_data
 
+# Load input data from command line argument
+input_data = json.loads(sys.argv[1])
 input_data = cleaning(input_data)
 
 # Extracting values from the dictionary and creating a list
@@ -38,14 +37,17 @@ input_list = [
     input_data["TT4"], input_data["FTI"]
 ]
 
-with open("xgmodel.pkl", "rb") as model_file:
-    model = pickle.load(model_file)
+# Load the XGBoost model
+model = xgb.Booster()
+model.load_model('xgmodel.pkl')
 
-# Assuming the model expects input as a list
+# Assuming the model expects input as a DMatrix
 # Make predictions using the model
-y_pred = model.predict([input_list])
+d_matrix = xgb.DMatrix([input_list])
+y_pred = model.predict(d_matrix)
 
-resulting = [encoding[i] for i in y_pred]
+resulting = [encoding[int(round(i))] for i in y_pred]
 received = {"condition": resulting[0]}
 
+# Print the result as a JSON string
 print(json.dumps(received))
