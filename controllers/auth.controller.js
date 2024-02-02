@@ -292,6 +292,7 @@ const authController = {
         sendOtp(user?.uname, user?.email, otp);
         await User.updateOne({ uname: logged_user }, { $set: { otp } });
       } else {
+        sendOtp(user?.uname, user?.email, user?.otp);
       }
       res.json({
         success: true,
@@ -310,6 +311,7 @@ const authController = {
     try {
       const { logged_user } = getUser();
       const user = await User.findOne({ uname: logged_user });
+      await User.updateOne({ uname: logged_user }, { $set: { otp: "" } });
       return res.json({
         success: true,
         otp: user?.otp,
@@ -470,8 +472,6 @@ const authController = {
       });
     }
   },
-
- 
 };
 
 module.exports = authController;
