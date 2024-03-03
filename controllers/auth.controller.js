@@ -3,7 +3,6 @@ const statusEnum = require("../enums/status");
 const User = require("../models/user.model");
 const jwtUtils = require("../utils/jwt");
 const openai = require("../utils/chatgpt");
-const { spawn } = require("child_process");
 const fs = require("fs").promises;
 const { sendEmail } = require("../utils/sendPlan");
 const { sendOtp } = require("../utils/sendOtp");
@@ -93,8 +92,6 @@ const authController = {
 
       accessToken = jwtUtils.generateToken({ userId: user?._id });
 
-      setUser(userData?.uname, accessToken);
-
       //const { l_user, usertoken } = getUser();  refernce
 
       return res.json({
@@ -107,61 +104,11 @@ const authController = {
     }
   },
 
-  profile: async (req, res) => {
-    try {
-      const { gender, age, height, weight } = req.body;
-
-      const { logged_user } = getUser();
-      const user = User.findOne({ uname: logged_user });
-
-      const result = await user.updateOne(
-        { uname: logged_user },
-        { $set: { gender, age, height, weight } }
-      );
-
-      if (result.nModified === 0) {
-        return res
-          .status(404)
-          .json({ success: false, message: "User not found" });
-      }
-
-      return res.json({
-        success: true,
-        data: { message: "User details updated successfully" },
-      });
-    } catch (error) {
-      console.error(error);
-      return res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
-    }
-  },
-
-  disp: async (req, res) => {
-    try {
-      const { logged_user } = getUser();
-      const user = await User.findOne({ uname: logged_user });
-
-      if (!user) {
-        return res.status(404).json({
-          success: false,
-          message: "User not found",
-        });
-      }
-
-      return res.json({ user });
-    } catch (error) {
-      console.error("Error:", error);
-      return res.status(500).json({ error: "Internal server error" });
-    }
-  },
-
   update: async (req, res) => {
     try {
-      const { age, uname, weight, height } = req.body;
-      const { logged_user } = getUser();
+      const { age, uname, weight, height, email } = req.body;
 
-      const user = User.findOne({ uname: logged_user });
+      const user = User.findOne({ email });
 
       if (!user) {
         return res
@@ -170,13 +117,9 @@ const authController = {
       }
 
       const result = await User.updateOne(
-        { uname: logged_user },
+        { email },
         { $set: { uname, age, height, weight } }
       );
-
-      const { usertoken } = getUser();
-
-      setUser(uname, usertoken);
 
       if (result.nModified === 0) {
         return res
@@ -198,8 +141,8 @@ const authController = {
 
   gpt: async (req, res) => {
     try {
+      const logged_user = req.body.uname;
       const userPrompt = req.body.user_prompt;
-      const { logged_user } = getUser();
 
       const user = await User.findOne({ uname: logged_user });
 
@@ -270,19 +213,6 @@ const authController = {
     }
   },
 
-  logout: async (req, res) => {
-    try {
-      setUser("", "");
-      res.json({
-        success: true,
-        data: "",
-      });
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({ error: "error" });
-    }
-  },
-
   otp: async (req, res) => {
     try {
       const { logged_user } = getUser();
@@ -291,8 +221,6 @@ const authController = {
         const otp = OTP();
         sendOtp(user?.uname, user?.email, otp);
         await User.updateOne({ uname: logged_user }, { $set: { otp } });
-      } else {
-        sendOtp(user?.uname, user?.email, user?.otp);
       }
       res.json({
         success: true,
@@ -361,10 +289,9 @@ const authController = {
 
   feedback: async (req, res) => {
     try {
-      const { feedback } = req.body;
-      const { logged_user } = getUser();
+      const { feedback, uname } = req.body;
 
-      const user = await User.findOne({ uname: logged_user });
+      const user = await User.findOne({ uname });
 
       if (!user) {
         return res.json({
@@ -373,7 +300,7 @@ const authController = {
         });
       }
 
-      sendFeedback(user?.uname, feedback);
+      sendFeedback(uname, feedback);
 
       return res.json({
         success: true,
@@ -391,7 +318,7 @@ const authController = {
   googlesignup: async (req, res) => {
     try {
       const { displayName, uid, email } = req.body;
-      const check = await User.findOne({ email });
+      const check = await User.findOne({ email, uname: displayName });
 
       if (check)
         return res
@@ -416,11 +343,41 @@ const authController = {
     }
   },
 
+  profile: async (req, res) => {
+    try {
+      const { gender, age, height, weight } = req.body;
+
+      const { logged_user } = getUser();
+      const user = User.findOne({ uname: logged_user });
+
+      const result = await user.updateOne(
+        { uname: logged_user },
+        { $set: { gender, age, height, weight } }
+      );
+
+      if (result.nModified === 0) {
+        return res
+          .status(404)
+          .json({ success: false, message: "User not found" });
+      }
+
+      return res.json({
+        success: true,
+        data: { message: "User details updated successfully" },
+      });
+    } catch (error) {
+      console.error(error);
+      return res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
+    }
+  },
+
   googlesignin: async (req, res) => {
     try {
-      const { email } = req.body;
+      const { email, displayName } = req.body;
 
-      const user = await User.findOne({ email });
+      const user = await User.findOne({ email, uname: displayName });
       if (!user) return res.json({ success: false, msg: "user not found" });
 
       const { password: pw, ...userData } = user?._doc;
@@ -433,20 +390,6 @@ const authController = {
         success: true,
         msg: "finally",
         data: { accessToken, user: userData },
-      });
-    } catch (error) {
-      console.log(error);
-      return res.json({ success: false, msg: "failure" });
-    }
-  },
-
-  access: async (req, res) => {
-    try {
-      const { usertoken } = getUser();
-
-      return res.json({
-        accessToken: usertoken,
-        success: true,
       });
     } catch (error) {
       console.log(error);
