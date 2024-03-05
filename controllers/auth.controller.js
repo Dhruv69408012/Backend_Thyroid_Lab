@@ -145,6 +145,7 @@ const authController = {
       const userPrompt = req.body.user_prompt;
 
       const user = await User.findOne({ uname: logged_user });
+      console.log(userPrompt);
 
       if (!userPrompt) {
         return res.status(400).json({
